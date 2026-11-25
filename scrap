@@ -1,0 +1,48 @@
+# pip install requests beautifulsoup4
+
+# ==========================================
+# WEB SCRAPING CON PYTHON Y BEAUTIFULSOUP
+# ==========================================
+
+# 1. Importar librerías
+import requests
+from bs4 import BeautifulSoup
+
+# 2. Definir la URL de la página web
+url = "https://books.toscrape.com/"
+
+# 3. Solicitar el contenido de la página
+respuesta = requests.get(url)
+
+# 4. Verificar si la conexión fue exitosa
+if respuesta.status_code == 200:
+
+    # 5. Analizar el contenido HTML
+    soup = BeautifulSoup(respuesta.text, "html.parser")
+
+    # 6. Buscar todos los libros de la página
+    libros = soup.find_all("article", class_="product_pod")
+
+    # 7. Recorrer cada libro encontrado
+    for libro in libros:
+
+        # Extraer el título
+        titulo = libro.h3.a["title"]
+
+        # Extraer el precio
+        precio = libro.find("p", class_="price_color").text
+
+        # Extraer la disponibilidad
+        disponibilidad = libro.find(
+            "p", class_="instock availability"
+        ).text.strip()
+
+        # 8. Mostrar los resultados
+        print("Libro:", titulo)
+        print("Precio:", precio)
+        print("Disponibilidad:", disponibilidad)
+        print("-" * 40)
+
+else:
+    print("Error al acceder a la página web.")
+    print("Código de respuesta:", respuesta.status_code)
