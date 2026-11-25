@@ -1,0 +1,85 @@
+
+# ==================================================
+# PROYECTO: WEB SCRAPING + EXPORTACION A EXCEL
+# ==================================================
+
+# 1. Importar librerías
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+# 2. Definir la página web
+url = "https://books.toscrape.com/"
+
+# 3. Solicitar el contenido de la página
+respuesta = requests.get(url)
+
+# 4. Verificar la conexión
+if respuesta.status_code == 200:
+
+    # 5. Analizar el HTML
+    soup = BeautifulSoup(respuesta.text, "html.parser")
+
+    # 6. Buscar todos los libros
+    libros = soup.find_all("article", class_="product_pod")
+
+    # 7. Crear una lista vacía para almacenar los datos
+    datos = []
+
+    # 8. Recorrer cada libro
+    for libro in libros:
+
+        # Extraer información
+        titulo = libro.h3.a["title"]
+
+        precio = libro.find(
+            "p", class_="price_color"
+        ).text
+
+        disponibilidad = libro.find(
+            "p", class_="instock availability"
+        ).text.strip()
+
+        # Guardar los datos en la lista
+        datos.append({
+            "Titulo": titulo,
+            "Precio": precio,
+            "Disponibilidad": disponibilidad
+        })
+
+    # 9. Convertir los datos en una tabla
+    tabla = pd.DataFrame(datos)
+
+    # 10. Exportar la tabla a Excel
+    tabla.to_excel(
+        "libros_extraidos.xlsx",
+        index=False
+    )
+
+    # 11. Mostrar resultados
+    print("WEB SCRAPING FINALIZADO")
+    print("Cantidad de libros:", len(datos))
+    print("Archivo Excel creado: libros_extraidos.xlsx")
+
+    print("\nVista previa de los datos:")
+    print(tabla)
+
+else:
+    print("Error al acceder a la página web.")
+    print("Código:", respuesta.status_code)
+
+
+
+
+
+
+
+
+
+
+
+
+
+import pandas as pd
+
+pd.read_excel("libros_extraidos.xlsx")
